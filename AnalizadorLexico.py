@@ -54,6 +54,48 @@ token ={
     #Otros
     'ID',
     'NUMBER',
+
+    # Rafael Merchan ini
+    # Palabras reservadas
+    'FLOAT',
+    'DOUBLE',
+    'CHAR',
+    'DO',
+    'SWITCH',
+    'CASE',
+    'DEFAULT',
+    'BREAK',
+    'CONTINUE',
+    'PUBLIC',
+    'PRIVATE',
+    'STATIC',
+    'CONST',
+    'EXPLICIT',
+    'DELETE',
+    'STATIC',
+    'TYPEDEF',
+    'TRY',
+    'CATCH',
+    'SIZEOF',
+    # Simbolos
+    'MODULE',
+    'NOT',
+    'AND',
+    'OR',
+    'BITAND',
+    'BITOR',
+    'BITXOR',
+    'BITNOT',
+    'PLUSEQUAL',
+    'MINUSEQUAL',
+    'TIMESEQUAL',
+    'DIVIDEEQUAL',
+    'COLON',
+    'APOSTROPHE',
+    'BACKSLASH',
+    # Otros
+    'WHITESPACE',
+    # Rafael Merchan fin
 }
 
 
@@ -79,6 +121,25 @@ t_LBLOCK = r'{'
 t_RBLOCK = r'}'
 t_QUOTES = r'\"'
 # Stephany Cabezas
+
+# Rafael Merchan ini
+t_MODULE = r'%'
+t_NOT = r'!'
+t_AND = r'&&'
+t_OR = r'\|\|'
+t_BITAND = r'&'
+t_BITOR = r'\|'
+t_BITXOR = r'\^'
+t_BITNOT = r'~'
+t_PLUSEQUAL = r'\+='
+t_MINUSEQUAL = r'-='
+t_TIMESEQUAL = r'\*='
+t_DIVIDEEQUAL = r'/='
+t_COLON = r':'
+t_APOSTROPHE = r"'"
+t_BACKSLASH = r'\\'
+t_WHITESPACE = r'\s+'
+# Rafael Merchan fin
 
 def t_INCLUDE(t):
     r'include'
