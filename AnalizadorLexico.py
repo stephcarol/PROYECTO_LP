@@ -475,8 +475,7 @@ def Analizador_lexico():
     
     
     filename = 'test/prueba.cpp'
-    filename2 = 'test/pruebaRM.cpp'
-    filename3 = 'test/prueba3.cpp'
+
     
     
     if os.path.exists(filename):
@@ -504,12 +503,63 @@ def Analizador_lexico():
         print(f"Análisis léxico completado. Archivo de tokens generado: {log_filename}")
 
     else:
-        print("El archivo no existe")
+        print("El archivo 1 no existe")
 
     # Stephany Cabezas
+    # Sebastian Ceballos
+    filename2 = 'test/pruebaRM.cpp'
+    filename3 = 'test/prueba3.cpp'
+    if os.path.exists(filename2):
+        with open(filename2, 'r') as f:
+            data = f.read()
+        lexer = lex.lex()
+        tokens_list = test(data, lexer)
 
-    # Ejecutar el analizador léxico al correr el script
-    if _name_ == '_main_':
-        Analizador_lexico()
+        if not os.path.exists('log'):
+            os.makedirs('log')
+
+        now = datetime.now()
+        timestamp = now.strftime("%d%m%Y-%Hh%M")
+
+        log_filename = f'log/lexico2-{username}-{timestamp}.txt'
+
+        # Escribir tokens al archivo de log
+        with open(log_filename, 'w') as log_file:
+            for token in tokens_list:
+                log_file.write(str(token) + '\n')
+
+        print(f"Análisis léxico completado. Archivo de tokens generado: {log_filename}")
+
+    else:
+        print("El archivo 1 no existe")
+
+    if os.path.exists(filename3):
+        with open(filename3, 'r') as f:
+            data = f.read()
+        lexer = lex.lex()
+        tokens_list = test(data, lexer)
+
+        if not os.path.exists('log'):
+            os.makedirs('log')
+
+        now = datetime.now()
+        timestamp = now.strftime("%d%m%Y-%Hh%M")
+
+        log_filename = f'log/lexico3-{username}-{timestamp}.txt'
+
+        # Escribir tokens al archivo de log
+        with open(log_filename, 'w') as log_file:
+            for token in tokens_list:
+                log_file.write(str(token) + '\n')
+
+        print(f"Análisis léxico completado. Archivo de tokens generado: {log_filename}")
+
+    else:
+        print("El archivo 3 no existe")
+
+
+
+# Ejecutar el analizador léxico al correr el script
+Analizador_lexico()
         
         
