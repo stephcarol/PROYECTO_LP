@@ -98,7 +98,6 @@ tokens =(
 )
 
 
-
 # Reglas de Expresiones Regualres para token de Contexto simple
 
 t_PLUS = r'\+'
@@ -139,6 +138,10 @@ t_APOSTROPHE = r"'"
 t_BACKSLASH = r'\\'
 t_WHITESPACE = r'\s+'
 # Rafael Merchan fin
+#Sebastian Ceballos ini
+#t_QUESTION = r'\?'
+#t_ELLIPSIS = r'\.\.\.'
+#Sebastian Ceballos fin
 
 #Sebastian Ceballos
 def t_INCLUDE(t):
@@ -217,17 +220,73 @@ def t_FOR(t):
     r'for'
     return t
 
-def t_STATIC(t):
-    r'static'
-    return t
-#Stephany Cabezas
-
-#Rafael Merchan
 
 def t_NUMBER(t):
     r'\d+'
     t.value = int(t.value)
     return t
+    
+# Rafael Merchan ini
+def t_FLOAT(t):
+    r'float'
+    return t
+
+def t_DOUBLE(t):
+    r'double'
+    return t
+
+def t_CHAR(t):
+    r'char'
+    return t
+
+def t_DO(t):
+    r'do'
+    return t
+
+def t_CONTINUE(t):
+    r'continue'
+    return t
+
+def t_PUBLIC(t):
+    r'public'
+    return t
+
+def t_PRIVATE(t):
+    r'private'
+    return t
+
+def t_STATIC(t):
+    r'static'
+    return t
+
+def t_CONST(t):
+    r'const'
+    return t
+
+def t_EXPLICIT(t):
+    r'explicit'
+    return t
+
+def t_DELETE(t):
+    r'delete'
+    return t
+
+def t_TYPEDEF(t):
+    r'typedef'
+    return t
+
+def t_TRY(t):
+    r'try'
+    return t
+
+def t_CATCH(t):
+    r'catch'
+    return t
+
+def t_SIZEOF(t):
+    r'sizeof'
+    return t
+# Rafael Merchan fin
 
 #exprecion regular para reconocer los identificadores
 
@@ -293,12 +352,12 @@ def t_newline(t):
 t_ignore = ' \t'
 
 
-def t_comments(t):
+def t_COMMENT(t):
     r'/\*(.|\n)*?\*/'
     t.lexer.lineno += t.value.count('\n')
 
 
-def t_comments_C99(t):
+def t_COMMENT_LINE(t):
     r'//(.)*?\n'
     t.lexer.lineno += 1
 
@@ -307,8 +366,8 @@ def t_error(t):
     print (("Error Lexico: " + str(t.value[0])))
     t.lexer.skip(1)
 
-#Rafael Merchan
 
+lexer = lex.lex()
 
 #Sebastian Ceballos
     
