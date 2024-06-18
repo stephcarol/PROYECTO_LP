@@ -73,7 +73,6 @@ tokens =(
     'CONST',
     'EXPLICIT',
     'DELETE',
-    'STATIC',
     'TYPEDEF',
     'TRY',
     'CATCH',
@@ -316,6 +315,68 @@ def t_NUMBER(t):
     r'\d+'
     t.value = int(t.value)
     return t
+    
+# Rafael Merchan ini
+def t_FLOAT(t):
+    r'float'
+    return t
+
+def t_DOUBLE(t):
+    r'double'
+    return t
+
+def t_CHAR(t):
+    r'char'
+    return t
+
+def t_DO(t):
+    r'do'
+    return t
+
+def t_CONTINUE(t):
+    r'continue'
+    return t
+
+def t_PUBLIC(t):
+    r'public'
+    return t
+
+def t_PRIVATE(t):
+    r'private'
+    return t
+
+def t_STATIC(t):
+    r'static'
+    return t
+
+def t_CONST(t):
+    r'const'
+    return t
+
+def t_EXPLICIT(t):
+    r'explicit'
+    return t
+
+def t_DELETE(t):
+    r'delete'
+    return t
+
+def t_TYPEDEF(t):
+    r'typedef'
+    return t
+
+def t_TRY(t):
+    r'try'
+    return t
+
+def t_CATCH(t):
+    r'catch'
+    return t
+
+def t_SIZEOF(t):
+    r'sizeof'
+    return t
+# Rafael Merchan fin
 
 #exprecion regular para reconocer los identificadores
 
