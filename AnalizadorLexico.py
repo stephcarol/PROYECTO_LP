@@ -4,7 +4,7 @@ from datetime import datetime
 
 #Lista de tokens 
 #Stephany Cabezas
-token ={
+tokens ={
     # Palabras Reservadas
     'INCLUDE',
     'USING',
@@ -96,6 +96,30 @@ token ={
     # Otros
     'WHITESPACE',
     # Rafael Merchan fin
+
+    #Sebastian Ceballos ini
+    # Palabras reservadas
+    'CLASS',  
+    'ENUM', 
+    'INLINE', 
+    'FRIEND', 
+    'VIRTUAL', 
+    'PROTECTED', 
+    'THIS', 
+    'THROW',
+    'GOTO', 
+    'LONG', 
+    'SHORT', 
+    'BOOL', 
+    'FINAL',
+    #Simbolos
+    'QUESTION', 
+    'ELLIPSIS' ,
+    'ADDRESS',
+    #Otros
+    'COMMENT',
+    'COMMMENT_LINE',
+    #Sebastian Ceballos fin
 }
 
 
@@ -140,6 +164,11 @@ t_APOSTROPHE = r"'"
 t_BACKSLASH = r'\\'
 t_WHITESPACE = r'\s+'
 # Rafael Merchan fin
+#Sebastian Ceballos ini
+t_QUESTION = r'\?'
+t_ELLIPSIS = r'\.\.\.'
+t_ADDRESS = r'&'
+#Sebastian Ceballos fin
 
 def t_INCLUDE(t):
     r'include'
@@ -215,6 +244,58 @@ def t_FOR(t):
     r'for'
     return t
 
+def t_CLASS(t):
+    r'class'
+    return t
+
+def t_ENUM(t):
+    r'enum'
+    return t
+
+def t_INLINE(t):
+    r'inline'
+    return t
+
+def t_FRIEND(t):
+    r'friend'
+    return t
+
+def t_VIRTUAL(t):
+    r'virtual'
+    return t
+
+def t_PROTECTED(t):
+    r'protected'
+    return t
+
+def t_THIS(t):
+    r'this'
+    return t
+
+def t_THROW(t):
+    r'throw'
+    return t
+
+def t_GOTO(t):
+    r'goto'
+    return t
+
+def t_LONG(t):
+    r'long'
+    return t
+
+def t_SHORT(t):
+    r'short'
+    return t
+
+def t_BOOL(t):
+    r'bool'
+    return t
+
+def t_FINAL(t):
+    r'final'
+    return t
+
 
 def t_NUMBER(t):
     r'\d+'
@@ -282,12 +363,12 @@ def t_newline(t):
 t_ignore = ' \t'
 
 
-def t_comments(t):
+def t_COMMENT(t):
     r'/\*(.|\n)*?\*/'
     t.lexer.lineno += t.value.count('\n')
 
 
-def t_comments_C99(t):
+def t_COMMENT_LINE(t):
     r'//(.)*?\n'
     t.lexer.lineno += 1
 
@@ -332,3 +413,46 @@ if __name__ == '__main__':
     #Build lexer and try on
     lexer.input(data)
     test(data, lexer)
+
+    #Sebastian Ceballos
+    
+def test(data, lexer):
+    lexer.input(data)
+    tokens_list = []
+    while True:
+        tok = lexer.token()
+        if not tok:
+            break
+        tokens_list.append(tok)
+    return tokens_list
+
+#Sebastian Ceballos
+
+# Stephany Cabezas
+# Función principal para el análisis léxico
+def Analizador_lexico():
+    
+    username = input("Ingrese su nombre de usuario para el log: ")
+    
+    
+    filename = 'test/prueba.cpp'
+    
+    
+    if os.path.exists(filename):
+        with open(filename, 'r') as f:
+            data = f.read()
+        lexer = lex.lex()
+        tokens_list = test(data, lexer)
+        
+        
+        if not os.path.exists('log'):
+            os.makedirs('log')
+        
+        
+        now = datetime.now()
+        timestamp = now.strftime("%d%m%Y-%Hh%M")
+        
+        
+        log_filename = f'log/lexico-{username}-{timestamp}.txt'
+        
+        
