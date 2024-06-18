@@ -4,7 +4,7 @@ from datetime import datetime
 
 #Lista de tokens 
 #Stephany Cabezas
-token ={
+tokens =(
     # Palabras Reservadas
     'INCLUDE',
     'USING',
@@ -72,7 +72,6 @@ token ={
     'CONST',
     'EXPLICIT',
     'DELETE',
-    'STATIC',
     'TYPEDEF',
     'TRY',
     'CATCH',
@@ -96,7 +95,7 @@ token ={
     # Otros
     'WHITESPACE',
     # Rafael Merchan fin
-}
+)
 
 
 
@@ -141,6 +140,7 @@ t_BACKSLASH = r'\\'
 t_WHITESPACE = r'\s+'
 # Rafael Merchan fin
 
+#Sebastian Ceballos
 def t_INCLUDE(t):
     r'include'
     return t
@@ -175,7 +175,9 @@ def t_GET(t):
     r'get'
     return t
 
+#Sebastian Ceballos
 
+#Stephany Cabezas
 def t_ENDL(t):
     r'endl'
     return t
@@ -215,6 +217,12 @@ def t_FOR(t):
     r'for'
     return t
 
+def t_STATIC(t):
+    r'static'
+    return t
+#Stephany Cabezas
+
+#Rafael Merchan
 
 def t_NUMBER(t):
     r'\d+'
@@ -234,7 +242,10 @@ def t_STRING(t):
     r'\"?(\w+ \ *\w*\d* \ *)\"?'
     return t
 
-
+#def t_LIBRARY(t):
+ #   r'<[^>]+>'
+#   return t
+#
 def t_HASH(t):
     r'\#'
     return t
@@ -296,39 +307,62 @@ def t_error(t):
     print (("Error Lexico: " + str(t.value[0])))
     t.lexer.skip(1)
 
+#Rafael Merchan
+
+
+#Sebastian Ceballos
+    
 def test(data, lexer):
     lexer.input(data)
+    tokens_list = []
     while True:
         tok = lexer.token()
         if not tok:
             break
-        print (tok)
+        tokens_list.append(tok)
+    return tokens_list
 
-lexer = lex.lex()
+#Sebastian Ceballos
 
+# Stephany Cabezas
+# Función principal para el análisis léxico
 def Analizador_lexico():
-    a = raw_input("direccion: ")
-    if ( os.path.exists (a)):
-        f = open(a)
-        data = f.read()
-        f.close()
-        #Build lexer and try on
-        lexer.input(data)
-        test(data, lexer)
+    # Nombre de usuario para el log (puedes modificar esta línea según tu necesidad)
+    username = input("Ingrese su nombre de usuario para el log: ")
+    
+    # Nombre y ruta del archivo a analizar (puedes modificar esta línea según tu necesidad)
+    filename = input("Ingrese la direccion del archivo: ")
+    
+    # Verificar si el archivo existe
+    if os.path.exists(filename):
+        with open(filename, 'r') as f:
+            data = f.read()
+        lexer = lex.lex()
+        tokens_list = test(data, lexer)
+        
+        # Crear carpeta de log si no existe
+        if not os.path.exists('log'):
+            os.makedirs('log')
+        
+        # Formatear la fecha y hora actual
+        now = datetime.now()
+        timestamp = now.strftime("%d%m%Y-%Hh%M")
+        
+        # Crear nombre de archivo de log
+        log_filename = f'log/lexico-{username}-{timestamp}.txt'
+        
+        # Escribir tokens al archivo de log
+        with open(log_filename, 'w') as log_file:
+            for token in tokens_list:
+                log_file.write(str(token) + '\n')
+        
+        print(f"Análisis léxico completado. Archivo de tokens generado: {log_filename}")
+    
     else:
-        print ("El archivo no existe")
+        print("El archivo no existe")
 
-# Test
+#Stephany Cabezas
+
+# Ejecutar el analizador léxico al correr el script
 if __name__ == '__main__':
-
-    # Test  ESTO ES SOLO PARA PROBAR EL FUNCINAMIENTO DE ANIZADOR LEXICO.
-    #Cargamos el archivo "c.cpp" que esta en la carpeta ejemplos y lo guardamos
-    #la variable data para despues enviarla al analizador lexico para que la
-    #descomponga en tokes
-
-    f = open('test/prueba.cpp')
-    data = f.read()
-    f.close()
-    #Build lexer and try on
-    lexer.input(data)
-    test(data, lexer)
+    Analizador_lexico()

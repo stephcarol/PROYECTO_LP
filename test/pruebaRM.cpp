@@ -1,12 +1,19 @@
 #include <iostream>
 
 #define PI 3.14
-
+using namespace std;
 float add(float a, float b) {
     return a + b;
 }
 
+ void updateValue(int &ref, int *ptr)
+    {
+        ref = 20;
+        *ptr = 30;
+    }
+
 int main() {
+    //Rafael Merchan
     float x = 5.5;
     double y = 10.1;
     char c = 'A';
@@ -62,4 +69,49 @@ int main() {
     std::cout << "PI: " << PI << std::endl;
 
     return 0;
+    //Rafael Merchan 
+
+
+    //Stephany Cabezas
+    // Declaración de variables
+    int a = 0;
+
+    // Bucle for
+    for(a = 0; a < 10; a++) {
+        std::cout << "Hola mundo" << std::endl;
+    }
+
+    // Comentario de una línea
+
+    // Comentario de bloque
+    /*
+    Esto es otro comentario
+    */
+
+    // Entrada de usuario
+    std::cin.get();
+
+    // Retorno de valor
+    return 0;
+    //Stephany Cabezas
+
+    //Sebasceb
+
+   
+   
+        int a = 10;
+        int b = 15;
+        int *p = &b;
+        updateValue(a, p);
+        switch (a)
+        {
+        case 20:
+            cout << "a es 20" << endl;
+            break;
+        default:
+            cout << "a no es 20" << endl;
+        }
+        cout << "b es " << b << endl;
+        return 0;
+    
 }
