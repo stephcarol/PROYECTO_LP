@@ -299,7 +299,7 @@ def t_BREAK(t):
     return t
 
 def t_DEFAULT(t):
-    r'deafult'
+    r'default'
     return t
 
 def t_SWITCH(t):
