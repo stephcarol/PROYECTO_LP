@@ -15,7 +15,8 @@ def p_declaracion_lista(p):
 def p_declaracion(p):
     '''declaracion : declaracion_var
                    | declaracion_funcion
-                   | declaracion_EC'''
+                   | declaracion_EC
+                   | declaracion_clase'''
     pass
 
 def p_declaracion_var(p):
@@ -160,6 +161,29 @@ def p_statement_list(p):
                       | statement'''
     pass
 
+# Declaraciones de clases
+def p_declaracion_clase(p):
+    '''declaracion_clase : class_header LBLOCK class_body RBLOCK'''
+    pass
+
+def p_class_header(p):
+    '''class_header : CLASS ID
+                    | CLASS ID COLON especificador'''
+    pass
+
+def p_class_body(p):
+    '''class_body : class_body class_member
+                  | class_member'''
+    pass
+
+def p_class_member(p):
+    '''class_member : especificador ID SEMICOLON
+                    | especificador ID EQUAL expresion SEMICOLON
+                    | especificador ID LPAREN parametro RPAREN compound_stmt
+                    | VOID ID LPAREN parametro RPAREN compound_stmt
+                    | declaracion_EC'''
+    pass
+
 def p_empty(p):
     '''empty :'''
     pass
@@ -167,6 +191,7 @@ def p_empty(p):
 # Error rule for syntax errors
 def p_error(p):
     print("Syntax error in input!")
+
 
 # Build the parser
 parser = yacc.yacc()
