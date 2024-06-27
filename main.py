@@ -1,29 +1,57 @@
 import ply.yacc as yacc
 from AnalizadorLexico import tokens
+import logging
+from datetime import datetime
+import os
+
+# Configuración del logger
+userGit = input("Ingrese su nombre de usuario para el log: ")
+now = datetime.now()
+timestamp = now.strftime("%d%m%Y-%Hh%M")
+
+# Asegurarse de que la carpeta "log" exista
+log_dir = "log"
+os.makedirs(log_dir, exist_ok=True)
+
+log_filename = os.path.join(log_dir, f'sintactico-{userGit}-{timestamp}.txt')
+
+logging.basicConfig(
+    filename=log_filename,
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
 # Reglas de la gramática
 
 def p_programa(p):
     '''programa : declaracion_lista'''
-    pass
+    logging.info("Reconocido programa con declaración lista")
 
 def p_declaracion_lista(p):
     '''declaracion_lista : declaracion_lista declaracion
                          | declaracion'''
-    pass
+    if len(p) == 3:
+        logging.info("Reconocida declaración lista: {}, {}".format(p[1], p[2]))
+    else:
+        logging.info("Reconocida declaración: {}".format(p[1]))
 
 def p_declaracion(p):
     '''declaracion : declaracion_var
                    | declaracion_funcion
                    | declaracion_EC
                    | declaracion_clase'''
-    pass
+    logging.info("Reconocida declaración: {}".format(p[1]))
 
 def p_declaracion_var(p):
     '''declaracion_var : especificador ID SEMICOLON
                        | especificador ID EQUAL expresion SEMICOLON
                        | especificador ID EQUAL estructura_dato SEMICOLON'''
-    pass
+    if len(p) == 4:
+        logging.info("Reconocida declaración de variable: {} {};".format(p[1], p[2]))
+    elif len(p) == 6 and isinstance(p[4], str):
+        logging.info("Reconocida declaración de variable con asignación: {} {} = {};".format(p[1], p[2], p[4]))
+    else:
+        logging.info("Reconocida declaración de variable con estructura de datos: {} {} = {};".format(p[1], p[2], p[4]))
 
 def p_especificador(p):
     '''especificador : INT
@@ -32,27 +60,36 @@ def p_especificador(p):
                      | CHAR
                      | STRING
                      | BOOL'''
-    pass
+    logging.info("Reconocido especificador: {}".format(p[1]))
 
 def p_declaracion_funcion(p):
     '''declaracion_funcion : especificador ID LPAREN parametro RPAREN compound_stmt
                            | VOID ID LPAREN parametro RPAREN compound_stmt'''
-    pass
+    if p[1] == 'void':
+        logging.info("Reconocida declaración de función void: {}({}) {}".format(p[2], p[4], p[6]))
+    else:
+        logging.info("Reconocida declaración de función: {} {}({}) {}".format(p[1], p[2], p[4], p[6]))
 
 def p_parametro(p):
     '''parametro : parametro_lista
                  | VOID'''
-    pass
+    logging.info("Reconocidos parámetros: {}".format(p[1]))
 
 def p_parametro_lista(p):
     '''parametro_lista : parametro_lista COMMA param
                        | param'''
-    pass
+    if len(p) == 4:
+        logging.info("Reconocida lista de parámetros: {}, {}".format(p[1], p[3]))
+    else:
+        logging.info("Reconocido parámetro: {}".format(p[1]))
 
 def p_param(p):
     '''param : especificador ID
              | especificador ID LBRACKET RBRACKET'''
-    pass
+    if len(p) == 3:
+        logging.info("Reconocido parámetro: {} {}".format(p[1], p[2]))
+    else:
+        logging.info("Reconocido parámetro array: {} {}[]".format(p[1], p[2]))
 
 def p_expresion(p):
     '''expresion : ID
@@ -60,12 +97,20 @@ def p_expresion(p):
                  | ID EQUAL expresion
                  | expresion_simple
                  | LPAREN expresion RPAREN'''
-    pass
+    if len(p) == 2:
+        logging.info("Reconocida expresión: {}".format(p[1]))
+    elif len(p) == 4 and p[2] == '=':
+        logging.info("Reconocida expresión de asignación: {} = {}".format(p[1], p[3]))
+    elif len(p) == 4:
+        logging.info("Reconocida expresión con paréntesis: ({})".format(p[2]))
 
 def p_expresion_simple(p):
     '''expresion_simple : expresion_aditiva igualdad expresion_aditiva
                         | expresion_aditiva'''
-    pass
+    if len(p) == 4:
+        logging.info("Reconocida expresión simple con igualdad: {} {} {}".format(p[1], p[2], p[3]))
+    else:
+        logging.info("Reconocida expresión aditiva: {}".format(p[1]))
 
 def p_igualdad(p):
     '''igualdad : LESS
@@ -74,107 +119,138 @@ def p_igualdad(p):
                 | GREATEREQUAL
                 | DEQUAL
                 | DISTINT'''
-    pass
+    logging.info("Reconocido operador de igualdad: {}".format(p[1]))
 
 def p_expresion_aditiva(p):
     '''expresion_aditiva : expresion_aditiva sumorest termino
                          | termino'''
-    pass
+    if len(p) == 4:
+        logging.info("Reconocida expresión aditiva: {} {} {}".format(p[1], p[2], p[3]))
+    else:
+        logging.info("Reconocido término: {}".format(p[1]))
 
 def p_sumorest(p):
     '''sumorest : PLUS
                 | MINUS'''
-    pass
+    logging.info("Reconocido operador aditivo: {}".format(p[1]))
 
 def p_termino(p):
     '''termino : termino multodiv factor
                | factor'''
-    pass
+    if len(p) == 4:
+        logging.info("Reconocido término con multiplicación/división: {} {} {}".format(p[1], p[2], p[3]))
+    else:
+        logging.info("Reconocido factor: {}".format(p[1]))
 
 def p_multodiv(p):
     '''multodiv : TIMES
                 | DIVIDE'''
-    pass
+    logging.info("Reconocido operador de multiplicación/división: {}".format(p[1]))
 
 def p_factor(p):
     '''factor : LPAREN expresion RPAREN
               | declaracion_var
               | NUMBER'''
-    pass
+    if len(p) == 4:
+        logging.info("Reconocido factor con paréntesis: ({})".format(p[2]))
+    elif len(p) == 2 and isinstance(p[1], str):
+        logging.info("Reconocido variable: {}".format(p[1]))
+    elif len(p) == 2 and isinstance(p[1], (int, float)):
+        logging.info("Reconocido número: {}".format(p[1]))
 
 def p_estructura_dato(p):
     '''estructura_dato : array_init
                        | tuple_init
                        | vector_init'''
-    pass
+    logging.info("Reconocida estructura de datos: {}".format(p[1]))
 
 def p_array_init(p):
     '''array_init : LBRACKET expresion_list RBRACKET'''
-    pass
+    logging.info("Reconocido inicializador de array: [{}]".format(p[2]))
 
 def p_tuple_init(p):
     '''tuple_init : LPAREN expresion_list RPAREN'''
-    pass
+    logging.info("Reconocido inicializador de tupla: ({})".format(p[2]))
 
 def p_vector_init(p):
     '''vector_init : LGREATER expresion_list RGREATER'''
-    pass
+    logging.info("Reconocido inicializador de vector: <{}>".format(p[2]))
 
 def p_expresion_list(p):
     '''expresion_list : expresion_list COMMA expresion
                       | expresion
                       | empty'''
-    pass
+    if len(p) == 4:
+        logging.info("Reconocida lista de expresiones: {}, {}".format(p[1], p[3]))
+    elif len(p) == 2:
+        logging.info("Reconocida expresión: {}".format(p[1]))
+    else:
+        logging.info("Reconocida lista vacía")
 
-# Estructuras de control (if/if-else, switch, while)
 def p_declaracion_EC(p):
     '''declaracion_EC : selection_stmt
                       | iteration_stmt'''
-    pass
+    logging.info("Reconocida declaración de estructura de control: {}".format(p[1]))
 
 def p_selection_stmt(p):
     '''selection_stmt : IF LPAREN expresion RPAREN statement
                       | IF LPAREN expresion RPAREN statement ELSE statement
                       | SWITCH LPAREN expresion RPAREN statement'''
-    pass
+    if len(p) == 6 and p[1] == 'if':
+        logging.info("Reconocida sentencia if: if ({}) {}".format(p[3], p[5]))
+    elif len(p) == 8:
+        logging.info("Reconocida sentencia if-else: if ({}) {} else {}".format(p[3], p[5], p[7]))
+    else:
+        logging.info("Reconocida sentencia switch: switch ({}) {}".format(p[3], p[5]))
 
 def p_iteration_stmt(p):
     '''iteration_stmt : WHILE LPAREN expresion RPAREN statement'''
-    pass
+    logging.info("Reconocida sentencia while: while ({}) {}".format(p[3], p[5]))
 
 def p_statement(p):
     '''statement : expresion_stmt
                  | compound_stmt'''
-    pass
+    logging.info("Reconocida sentencia: {}".format(p[1]))
 
 def p_expresion_stmt(p):
     '''expresion_stmt : expresion SEMICOLON
                       | SEMICOLON'''
-    pass
+    if len(p) == 3:
+        logging.info("Reconocida sentencia de expresión: {};".format(p[1]))
+    else:
+        logging.info("Reconocida sentencia vacía")
 
 def p_compound_stmt(p):
     '''compound_stmt : LBLOCK statement_list RBLOCK'''
-    pass
+    logging.info("Reconocida sentencia compuesta: {{ {} }}".format(p[2]))
 
 def p_statement_list(p):
     '''statement_list : statement_list statement
                       | statement'''
-    pass
+    if len(p) == 3:
+        logging.info("Reconocida lista de sentencias: {}, {}".format(p[1], p[2]))
+    else:
+        logging.info("Reconocida sentencia: {}".format(p[1]))
 
-# Declaraciones de clases
 def p_declaracion_clase(p):
     '''declaracion_clase : class_header LBLOCK class_body RBLOCK'''
-    pass
+    logging.info("Reconocida declaración de clase: {} {{ {} }}".format(p[1], p[3]))
 
 def p_class_header(p):
     '''class_header : CLASS ID
                     | CLASS ID COLON especificador'''
-    pass
+    if len(p) == 3:
+        logging.info("Reconocido encabezado de clase: class {}".format(p[2]))
+    else:
+        logging.info("Reconocido encabezado de clase: class {} : {}".format(p[2], p[4]))
 
 def p_class_body(p):
     '''class_body : class_body class_member
                   | class_member'''
-    pass
+    if len(p) == 3:
+        logging.info("Reconocido cuerpo de clase: {}, {}".format(p[1], p[2]))
+    else:
+        logging.info("Reconocido miembro de clase: {}".format(p[1]))
 
 def p_class_member(p):
     '''class_member : especificador ID SEMICOLON
@@ -182,16 +258,26 @@ def p_class_member(p):
                     | especificador ID LPAREN parametro RPAREN compound_stmt
                     | VOID ID LPAREN parametro RPAREN compound_stmt
                     | declaracion_EC'''
-    pass
+    if len(p) == 4:
+        logging.info("Reconocido miembro de clase: {} {};".format(p[1], p[2]))
+    elif len(p) == 6 and p[3] == '=':
+        logging.info("Reconocido miembro de clase con asignación: {} {} = {};".format(p[1], p[2], p[4]))
+    elif len(p) == 7:
+        if p[1] == 'void':
+            logging.info("Reconocida función miembro void: {}({}) {}".format(p[2], p[4], p[6]))
+        else:
+            logging.info("Reconocida función miembro: {} {}({}) {}".format(p[1], p[2], p[4], p[6]))
+    else:
+        logging.info("Reconocida declaración de estructura de control en clase: {}".format(p[1]))
 
 def p_empty(p):
     '''empty :'''
-    pass
+    logging.info("Reconocida producción vacía")
 
 # Error rule for syntax errors
 def p_error(p):
+    logging.error("Error de sintaxis en la entrada: {}".format(p))
     print("Syntax error in input!")
-
 
 # Build the parser
 parser = yacc.yacc()
