@@ -144,13 +144,17 @@ def p_igualdad(p):
                 | DEQUAL
                 | DISTINT'''
     logging.info("Reconocido operador de igualdad: {}".format(p[1]))
-
+    
 def p_expresion_aditiva(p):
     '''expresion_aditiva : expresion_aditiva sumorest termino
                          | termino'''
     if len(p) == 4:
+        if p[1] != p[3]:
+            errores_semantica.append(f"Error: Tipos incompatibles en operación aditiva: '{p[1]}' y '{p[3]}'.")
+        p[0] = p[1]
         logging.info("Reconocida expresión aditiva: {} {} {}".format(p[1], p[2], p[3]))
     else:
+        p[0] = p[1]
         logging.info("Reconocido término: {}".format(p[1]))
 
 def p_sumorest(p):
@@ -312,6 +316,113 @@ def p_class_member(p):
 def p_empty(p):
     '''empty :'''
     logging.info("Reconocida producción vacía")
+
+# Semantica Rafael Merchan ini
+def p_asignacion(p):
+    '''asignacion : ID EQUAL expresion SEMICOLON'''
+    if p[1] in symbol_table['variables']:
+        var_type = symbol_table['variables'][p[1]]['type']
+        expr_type = p[3]['type']
+        if var_type != expr_type:
+            errores_semantica.append(f"Error: Asignación de tipos incompatibles {var_type} = {expr_type}")
+    else:
+        errores_semantica.append(f"Error: Variable '{p[1]}' no declarada.")
+    logging.info("Reconocida asignación: {} = {}".format(p[1], p[3]['value']))
+
+def p_expresion_variable(p):
+    '''expresion_variable : ID'''
+    if p[1] in symbol_table['variables']:
+        if symbol_table['variables'][p[1]]['value'] is None:
+            errores_semantica.append(f"Error: Variable '{p[1]}' utilizada antes de ser inicializada.")
+    else:
+        errores_semantica.append(f"Error: Variable '{p[1]}' no declarada.")
+    p[0] = {'type': symbol_table['variables'][p[1]]['type'], 'value': p[1]}
+
+def p_return_stmt(p):
+    '''return_stmt : RETURN expresion SEMICOLON'''
+    current_func = symbol_table['current_function']
+    if current_func:
+        func_return_type = symbol_table['variables'][current_func]['return_type']
+        expr_type = p[2]['type']
+        if func_return_type != expr_type:
+            errores_semantica.append(f"Error: Tipo de retorno incompatible en la función '{current_func}': esperado {func_return_type}, encontrado {expr_type}")
+    else:
+        errores_semantica.append(f"Error: Sentencia return fuera de una función.")
+    logging.info("Reconocida sentencia de retorno: return {}".format(p[2]['value']))
+
+def p_func_call(p):
+    '''func_call : ID LPAREN argumento_lista RPAREN'''
+    if p[1] in symbol_table['variables'] and symbol_table['variables'][p[1]]['type'] == 'FUNCTION':
+        func_params = symbol_table['variables'][p[1]]['params']
+        arg_types = [arg['type'] for arg in p[3]]
+        if len(func_params) != len(arg_types):
+            errores_semantica.append(f"Error: Número incorrecto de argumentos en la llamada a la función '{p[1]}'.")
+        else:
+            for i in range(len(func_params)):
+                if func_params[i]['type'] != arg_types[i]:
+                    errores_semantica.append(f"Error: Tipo de argumento incompatible en la llamada a la función '{p[1]}': esperado {func_params[i]['type']}, encontrado {arg_types[i]}")
+    else:
+        errores_semantica.append(f"Error: Función '{p[1]}' no declarada.")
+    logging.info("Reconocida llamada a función: {}({})".format(p[1], p[3]))
+
+def p_member_access(p):
+    '''member_access : ID DOT ID'''
+    if p[1] in symbol_table['variables']:
+        var_type = symbol_table['variables'][p[1]]['type']
+        if var_type in symbol_table['classes']:
+            class_members = symbol_table['classes'][var_type]['members']
+            if p[3] not in class_members:
+                errores_semantica.append(f"Error: La clase '{var_type}' no tiene un miembro llamado '{p[3]}'.")
+        else:
+            errores_semantica.append(f"Error: Tipo '{var_type}' no es una clase.")
+    else:
+        errores_semantica.append(f"Error: Variable '{p[1]}' no declarada.")
+    logging.info("Reconocido acceso a miembro de clase: {}.{}".format(p[1], p[3]))
+
+def p_return_void_func(p):
+    '''return_void_func : VOID ID LPAREN parametro RPAREN compound_stmt'''
+    if p[2] in symbol_table['variables']:
+        errores_semantica.append(f"Error: Función '{p[2]}' ya declarada.")
+    else:
+        symbol_table['variables'][p[2]] = {'type': 'FUNCTION', 'return_type': 'void', 'params': p[4]}
+    logging.info("Reconocida declaración de función void: {}({}) {}".format(p[2], p[4], p[6]))
+def p_func_body(p):
+    '''func_body : compound_stmt'''
+    current_func = symbol_table['current_function']
+    if current_func:
+        func_return_type = symbol_table['variables'][current_func]['return_type']
+        if func_return_type != 'void' and not p[1].endswith('return'):
+            errores_semantica.append(f"Error: Función '{current_func}' debe retornar un valor.")
+    logging.info("Reconocido cuerpo de función: {}".format(p[1]))
+
+def p_class_constructor(p):
+    '''class_constructor : ID LPAREN parametro RPAREN LBLOCK statement_list RBLOCK'''
+    class_name = p[1]
+    if class_name in symbol_table['classes']:
+        class_members = symbol_table['classes'][class_name]['members']
+        for member in class_members:
+            if member not in p[6]:
+                errores_semantica.append(f"Error: Miembro '{member}' de la clase '{class_name}' no inicializado en el constructor.")
+    logging.info("Reconocido constructor de clase: {}({})".format(p[1], p[3]))
+
+def p_static_member_access(p):
+    '''static_member_access : ID SCOPE ID'''
+    if p[1] in symbol_table['classes']:
+        class_members = symbol_table['classes'][p[1]]['members']
+        if p[3] not in class_members or not class_members[p[3]].get('static', False):
+            errores_semantica.append(f"Error: Miembro '{p[3]}' no estático o no existe en la clase '{p[1]}'.")
+    else:
+        errores_semantica.append(f"Error: Clase '{p[1]}' no declarada.")
+    logging.info("Reconocido acceso a miembro estático de clase: {}::{}".format(p[1], p[3]))
+
+def p_variable_scope(p):
+    '''variable_scope : ID'''
+    if p[1] not in symbol_table['variables']:
+        errores_semantica.append(f"Error: Variable '{p[1]}' utilizada fuera de su alcance.")
+    logging.info("Reconocido acceso a variable: {}".format(p[1]))
+
+
+# Semantica Rafael Merchan fin
 
 # Error rule for syntax errors
 def p_error(p):
