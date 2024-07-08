@@ -26,9 +26,18 @@ symbol_table = {
     'variables': {},
     'classes': {}
 }
+current_class = None
+
+precedence = (
+    ('left', 'PLUS', 'MINUS'),
+    ('left', 'TIMES', 'DIVIDE'),
+    ('left', 'LESS', 'LESSEQUAL', 'GREATER', 'GREATEREQUAL', 'DEQUAL', 'DISTINT'),
+    ('right', 'EQUAL')
+)
 
 errores_semantica = []
 # Reglas de la gramática
+
 
 def p_programa(p):
     '''programa : declaracion_lista'''
@@ -262,12 +271,16 @@ def p_statement_list(p):
 
 def p_declaracion_clase(p):
     '''declaracion_clase : class_header LBLOCK class_body RBLOCK'''
+    global current_class
+    current_class = None
     logging.info("Reconocida declaración de clase: {} {{ {} }}".format(p[1], p[3]))
 
 #Semantica Sebastian Ceballos
 def p_class_header(p):
     '''class_header : CLASS ID
                     | CLASS ID COLON especificador'''
+    global current_class
+    current_class = p[2]
     if p[2] in symbol_table['classes']:
         errores_semantica.append(f"Error: Clase '{p[2]}' ya declarada.")
     else:
@@ -278,12 +291,12 @@ def p_class_header(p):
         logging.info("Reconocido encabezado de clase: class {} : {}".format(p[2], p[4]))
 
 def p_class_body(p):
-    '''class_body : class_body class_member
-                  | class_member'''
-    if len(p) == 3:
-        logging.info("Reconocido cuerpo de clase: {}, {}".format(p[1], p[2]))
-    else:
-        logging.info("Reconocido miembro de clase: {}".format(p[1]))
+    '''class_body : class_member_list'''
+
+
+def p_class_member_list(p):
+    '''class_member_list : class_member_list class_member
+                         | class_member'''
 
 #Semantica Sebastian Ceballos
 def p_class_member(p):

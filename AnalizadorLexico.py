@@ -95,6 +95,8 @@ tokens =(
     # Otros
     'WHITESPACE',
     # Rafael Merchan fin
+     'CLASS',
+    'BOOL',
 )
 
 
@@ -144,6 +146,15 @@ t_WHITESPACE = r'\s+'
 #Sebastian Ceballos fin
 
 #Sebastian Ceballos
+def t_CLASS(t):
+    r'class'
+    return t
+
+def t_BOOL(t):
+    r'bool'
+    return t
+
+
 def t_INCLUDE(t):
     r'include'
     return t
