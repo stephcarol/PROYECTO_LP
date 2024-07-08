@@ -20,7 +20,14 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
+#Semantica Sebastian Ceballos
+# Tabla de símbolos
+symbol_table = {
+    'variables': {},
+    'classes': {}
+}
 
+errores_semantica = []
 # Reglas de la gramática
 
 def p_programa(p):
@@ -42,10 +49,21 @@ def p_declaracion(p):
                    | declaracion_clase'''
     logging.info("Reconocida declaración: {}".format(p[1]))
 
+#Semantica Sebastian Ceballos
 def p_declaracion_var(p):
     '''declaracion_var : especificador ID SEMICOLON
                        | especificador ID EQUAL expresion SEMICOLON
                        | especificador ID EQUAL estructura_dato SEMICOLON'''
+    if len(p) == 4:
+        if p[2] in symbol_table['variables']:
+            errores_semantica.append(f"Error: Variable '{p[2]}' ya declarada.")
+        else:
+            symbol_table['variables'][p[2]] = {'type': p[1], 'value': None}
+    else:
+        if p[2] in symbol_table['variables']:
+            errores_semantica.append(f"Error: Variable '{p[2]}' ya declarada.")
+        else:
+            symbol_table['variables'][p[2]] = {'type': p[1], 'value': p[4]}
     if len(p) == 4:
         logging.info("Reconocida declaración de variable: {} {};".format(p[1], p[2]))
     elif len(p) == 6 and isinstance(p[4], str):
@@ -60,6 +78,7 @@ def p_especificador(p):
                      | CHAR
                      | STRING
                      | BOOL'''
+    p[0] = p[1]
     logging.info("Reconocido especificador: {}".format(p[1]))
 
 def p_declaracion_funcion(p):
@@ -91,12 +110,17 @@ def p_param(p):
     else:
         logging.info("Reconocido parámetro array: {} {}[]".format(p[1], p[2]))
 
+#Semantica Sebastian Ceballos
 def p_expresion(p):
     '''expresion : ID
                  | NUMBER
                  | ID EQUAL expresion
                  | expresion_simple
                  | LPAREN expresion RPAREN'''
+    if len(p) == 2 and p[1] not in symbol_table['variables']:
+        errores_semantica.append(f"Error: Variable '{p[1]}' no declarada.")
+    elif len(p) == 4 and p[1] not in symbol_table['variables']:
+        errores_semantica.append(f"Error: Variable '{p[1]}' no declarada.")
     if len(p) == 2:
         logging.info("Reconocida expresión: {}".format(p[1]))
     elif len(p) == 4 and p[2] == '=':
@@ -236,9 +260,14 @@ def p_declaracion_clase(p):
     '''declaracion_clase : class_header LBLOCK class_body RBLOCK'''
     logging.info("Reconocida declaración de clase: {} {{ {} }}".format(p[1], p[3]))
 
+#Semantica Sebastian Ceballos
 def p_class_header(p):
     '''class_header : CLASS ID
                     | CLASS ID COLON especificador'''
+    if p[2] in symbol_table['classes']:
+        errores_semantica.append(f"Error: Clase '{p[2]}' ya declarada.")
+    else:
+        symbol_table['classes'][p[2]] = {'base': p[4] if len(p) == 5 else None, 'members': {}}
     if len(p) == 3:
         logging.info("Reconocido encabezado de clase: class {}".format(p[2]))
     else:
@@ -252,12 +281,22 @@ def p_class_body(p):
     else:
         logging.info("Reconocido miembro de clase: {}".format(p[1]))
 
+#Semantica Sebastian Ceballos
 def p_class_member(p):
     '''class_member : especificador ID SEMICOLON
                     | especificador ID EQUAL expresion SEMICOLON
                     | especificador ID LPAREN parametro RPAREN compound_stmt
                     | VOID ID LPAREN parametro RPAREN compound_stmt
                     | declaracion_EC'''
+    if p[2] in symbol_table['classes'][current_class]['members']:
+        errores_semantica.append(f"Error: Miembro '{p[2]}' ya declarado en la clase '{current_class}'.")
+    else:
+        if len(p) == 4:
+            symbol_table['classes'][current_class]['members'][p[2]] = {'type': p[1], 'value': None}
+        elif len(p) == 6 and p[3] == '=':
+            symbol_table['classes'][current_class]['members'][p[2]] = {'type': p[1], 'value': p[4]}
+        else:
+            symbol_table['classes'][current_class]['members'][p[2]] = {'type': p[1], 'params': p[4], 'body': p[6]}
     if len(p) == 4:
         logging.info("Reconocido miembro de clase: {} {};".format(p[1], p[2]))
     elif len(p) == 6 and p[3] == '=':
@@ -290,3 +329,8 @@ while True:
     if not s: continue
     result = parser.parse(s)
     print(result)
+    if errores_semantica:
+        print("Errores semánticos encontrados:")
+        for error in errores_semantica:
+            print(error)
+        errores_semantica.clear()
