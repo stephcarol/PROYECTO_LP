@@ -1,33 +1,26 @@
-# AnalizadorSemantico.py
+from AnalizadorSintactico import parser, symbol_table, analyze_syntax
 
-from AnalizadorSintactico import parser, symbol_table, errores_sintacticos
-import logging
-
-# Configuración del logger
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
-
-# Errores semánticos
+# Lista para almacenar errores semánticos
 errores_semanticos = []
 
 # Función para realizar análisis semántico
 def analyze_semantics(input_code):
+    global errores_semanticos
+    errores_semanticos = []  # Reiniciar la lista de errores semánticos
     parser.parse(input_code)
+    errores_sintacticos = analyze_syntax(input_code)
     if not errores_sintacticos:
         check_variable_scope()
         check_variable_assignment()
         check_function_calls()
         check_type_consistency()
-    else:
-        logging.error("Errores sintácticos encontrados, no se realizó el análisis semántico.")
+    return errores_semanticos
 
 # Verificar el alcance de las variables
 def check_variable_scope():
     for var in symbol_table['variables']:
         if not symbol_table['variables'][var]['value']:
-            logging.warning(f"Variable '{var}' declarada pero no inicializada.")
+            errores_semanticos.append(f"Warning: Variable '{var}' declarada pero no inicializada.")
 
 # Verificar la asignación de variables
 def check_variable_assignment():
@@ -48,30 +41,3 @@ def check_type_consistency():
             var_type = type(symbol_table['variables'][var]['value'])
             if var_type != symbol_table['variables'][var]['type']:
                 errores_semanticos.append(f"Error: Tipo incorrecto para variable '{var}'. Esperado '{symbol_table['variables'][var]['type']}', recibido '{var_type}'.")
-
-# Función para imprimir errores semánticos
-def print_semantic_errors():
-    if errores_semanticos:
-        print("Se encontraron errores semánticos:")
-        for error in errores_semanticos:
-            print(error)
-    else:
-        print("Análisis semántico completado sin errores.")
-
-# Código de prueba
-if __name__ == '__main__':
-    input_code = '''
-    int a = 5;
-    float b = 3.14;
-
-    void sum(int x, int y) {
-        int result = x + y;
-    }
-
-    a = 10;
-    b = a + 2.5;
-    sum(a, 5);
-    '''
-
-    analyze_semantics(input_code)
-    print_semantic_errors()

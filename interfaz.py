@@ -1,10 +1,11 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
-from AnalizadorLexico import analyze_lexical, errores_lexicos
-from AnalizadorSintactico import analyze_syntax, errores_sintacticos
-from AnalizadorSemantico import analyze_semantics, print_semantic_errors
+from AnalizadorLexico import analyze_lexical, get_lexical_errors
+from AnalizadorSintactico import analyze_syntax
+from AnalizadorSemantico import analyze_semantics
 
 class InterfazAnalizador:
+
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("Analizador Completo")
@@ -35,33 +36,27 @@ class InterfazAnalizador:
         input_code = self.text_area.get("1.0", tk.END)
 
         # Análisis léxico
-        analyze_lexical(input_code)
-        errores_lexicos = errores_lexicos if errores_lexicos else []
-
+        tokens = analyze_lexical(input_code)
+        errores_lexicos = get_lexical_errors()
         if errores_lexicos:
             self.show_errors("Errores léxicos encontrados:", errores_lexicos)
-            return
 
         # Análisis sintáctico
-        analyze_syntax(input_code)
-        errores_sintacticos = errores_sintacticos if errores_sintacticos else []
-
+        errores_sintacticos = analyze_syntax(input_code)
         if errores_sintacticos:
             self.show_errors("Errores sintácticos encontrados:", errores_sintacticos)
-            return
 
         # Análisis semántico
-        analyze_semantics(input_code)
-        errores_semanticos = errores_semanticos if errores_semanticos else []
-
-        if errores_semanticos:
-            self.show_errors("Errores semánticos encontrados:", errores_semanticos)
-        else:
-            self.result_area.insert(tk.END, "Análisis semántico completado sin errores.")
+        # errores_semanticos = analyze_semantics(input_code)
+        # if errores_semanticos:
+        #     self.show_errors("Errores semánticos encontrados:", errores_semanticos)
 
     def show_errors(self, title, errors):
+        current_content = self.result_area.get("1.0", tk.END).strip()
+        if current_content:
+            current_content += "\n"
         self.result_area.delete("1.0", tk.END)
-        self.result_area.insert(tk.END, f"{title}\n")
+        self.result_area.insert(tk.END, f"{current_content}{title}\n")
         for error in errors:
             self.result_area.insert(tk.END, f"{error}\n")
 

@@ -1,27 +1,25 @@
-# AnalizadorSintactico.py
-
 import ply.yacc as yacc
 from AnalizadorLexico import tokens
 import logging
 from datetime import datetime
 import os
 
-# Configuración del logger
-userGit = input("Ingrese su nombre de usuario para el log: ")
-now = datetime.now()
-timestamp = now.strftime("%d%m%Y-%Hh%M")
+# # Configuración del logger
+# userGit = input("Ingrese su nombre de usuario para el log: ")
+# now = datetime.now()
+# timestamp = now.strftime("%d%m%Y-%Hh%M")
 
-# Asegurarse de que la carpeta "log" exista
-log_dir = "log"
-os.makedirs(log_dir, exist_ok=True)
+# # Asegurarse de que la carpeta "log" exista
+# log_dir = "log"
+# os.makedirs(log_dir, exist_ok=True)
 
-log_filename = os.path.join(log_dir, f'sintactico-{userGit}-{timestamp}.txt')
+# log_filename = os.path.join(log_dir, f'sintactico-{userGit}-{timestamp}.txt')
 
-logging.basicConfig(
-    filename=log_filename,
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+# logging.basicConfig(
+#     filename=log_filename,
+#     level=logging.INFO,
+#     format='%(asctime)s - %(levelname)s - %(message)s'
+# )
 
 # Tabla de símbolos
 symbol_table = {
@@ -32,15 +30,13 @@ symbol_table = {
 
 current_class = None
 
-# Errores sintácticos
+# Lista para almacenar errores sintácticos
 errores_sintacticos = []
-
 
 # Reglas de la gramática
 def p_programa(p):
     '''programa : declaracion_lista'''
     logging.info("Reconocido programa con declaración lista")
-
 
 def p_declaracion_lista(p):
     '''declaracion_lista : declaracion_lista declaracion
@@ -50,19 +46,16 @@ def p_declaracion_lista(p):
     else:
         logging.info("Reconocida declaración lista: {} {}".format(p[1], p[2]))
 
-
 def p_declaracion(p):
     '''declaracion : declaracion_var
                    | declaracion_funcion'''
     logging.info("Reconocida declaración: {}".format(p[1]))
-
 
 def p_especificador(p):
     '''especificador : INT
                      | FLOAT'''
     p[0] = p[1]
     logging.info("Reconocido especificador: {}".format(p[1]))
-
 
 # Verificar declaración de variables
 def p_declaracion_var(p):
@@ -117,7 +110,6 @@ def p_igualdad(p):
     p[0] = p[1]
     logging.info("Reconocido operador de igualdad: {}".format(p[1]))
 
-
 # Verificar declaración de funciones
 def p_declaracion_funcion(p):
     '''declaracion_funcion : especificador ID LPAREN parametro RPAREN compound_stmt'''
@@ -125,7 +117,6 @@ def p_declaracion_funcion(p):
         logging.info("Reconocida declaración de función void: {}({}) {}".format(p[2], p[4], p[6]))
     else:
         logging.info("Reconocida declaración de función: {} {}({}) {}".format(p[1], p[2], p[4], p[6]))
-
 
 def p_parametro(p):
     '''parametro : especificador ID
@@ -141,7 +132,6 @@ def p_compound_stmt(p):
     '''compound_stmt : LBLOCK declaracion_lista RBLOCK'''
     p[0] = p[2]
     logging.info("Reconocido bloque de declaración: {{ {} }}".format(p[2]))
-
 
 # Verificar asignaciones y expresiones
 def p_expresion(p):
@@ -161,7 +151,6 @@ def p_expresion(p):
     elif len(p) == 4:
         logging.info("Reconocida expresión con paréntesis: ({})".format(p[2]))
 
-
 # Validar expresiones simples y operadores
 def p_expresion_simple(p):
     '''expresion_simple : expresion_aditiva igualdad expresion_aditiva
@@ -171,9 +160,6 @@ def p_expresion_simple(p):
     else:
         logging.info("Reconocida expresión aditiva: {}".format(p[1]))
 
-
-
-
 # Validar tipos en operaciones aditivas
 def p_expresion_aditiva(p):
     '''expresion_aditiva : termino sumorest expresion_aditiva
@@ -181,22 +167,18 @@ def p_expresion_aditiva(p):
     if len(p) > 1:
         if len(p) == 4:
             if p[1] != p[3]:
-                errores_semantica.append(f"Error: Tipos incompatibles en operación aditiva: '{p[1]}' y '{p[3]}'.")
+                errores_sintacticos.append(f"Error: Tipos incompatibles en operación aditiva: '{p[1]}' y '{p[3]}'.")
             p[0] = p[1]
             logging.info("Reconocida expresión aditiva: {} {} {}".format(p[1], p[2], p[3]))
         else:
             p[0] = p[1]
             logging.info("Reconocido término: {}".format(p[1]))
 
-
-
-
 # Validar tipos en operadores aditivos
 def p_sumorest(p):
     '''sumorest : PLUS
                 | MINUS'''
     logging.info("Reconocido operador aditivo: {}".format(p[1]))
-
 
 # Verificar alcance de variables
 def p_variable_scope(p):
@@ -221,42 +203,24 @@ def p_factor(p):
         p[0] = p[2]
         logging.info("Reconocido factor con paréntesis: ({})".format(p[2]))
 
-# Función para analizar el código de entrada
-def analyze_syntax(input_code):
-    parser = yacc.yacc()
-    result = parser.parse(input_code, lexer=lexer)
-    return result
-
-# Lista para almacenar errores sintácticos
-errores_sintacticos = []
-
 # Regla para errores sintácticos
 def p_error(p):
-    logging.error("Error sintáctico en la entrada: {}".format(p))
-    print("Error sintáctico en la entrada!")
+    error_msg = f"Error sintáctico en la entrada: {p}"
+    logging.error(error_msg)
+    errores_sintacticos.append(error_msg)
+    print(error_msg)
 
 # Construir el parser
 parser = yacc.yacc()
 
 # Función principal para analizar código de entrada
-def analyze_code(input_code):
-    result = parser.parse(input_code)
-    return result
+def analyze_syntax(input_code):
+    global errores_sintacticos
+    errores_sintacticos = []  # Resetear la lista de errores
+    parser.parse(input_code)
+    return errores_sintacticos
 
-
-# Código de prueba
-if __name__ == '__main__':
-    input_code = '''
-    int a = 5;
-    float b = 3.14;
-
-    void sum(int x, int y) {
-        int result = x + y;
-    }
-
-    a = 10;
-    b = a + 2.5;
-    sum(a, 5);
-    '''
-
-    analyze_code(input_code)
+# Ejemplo de uso
+# input_code = "int a; float b; int a = 5;"
+# errores = analyze_syntax(input_code)
+# print("Errores sintácticos encontrados:", errores)

@@ -99,34 +99,32 @@ t_DISTINT = r'!='
 # Ignorar caracteres de espacio en blanco y tabulación
 t_ignore = ' \t'
 
+# Variables globales para almacenar errores
+errores_lexicos = []
 
 # Función para manejar saltos de línea y contar números de línea
 def t_newline(t):
     r'\n+'
     t.lexer.lineno += len(t.value)
 
-
 # Función para manejar comentarios de múltiples líneas
 def t_COMMENT(t):
     r'/\*(.|\n)*?\*/'
     t.lexer.lineno += t.value.count('\n')
-
 
 # Función para manejar comentarios de una línea
 def t_COMMENT_LINE(t):
     r'//(.)*?\n'
     t.lexer.lineno += 1
 
-
 # Función para manejar errores léxicos
 def t_error(t):
-    print(f"Error léxico: Carácter inesperado '{t.value[0]}'")
+    global errores_lexicos
+    errores_lexicos.append(f"Error léxico: Carácter inesperado '{t.value[0]}'")
     t.lexer.skip(1)
-
 
 # Construir el analizador léxico
 lexer = lex.lex()
-
 
 # Función para probar el analizador léxico
 def test(data, lexer):
@@ -139,52 +137,11 @@ def test(data, lexer):
         tokens_list.append(tok)
     return tokens_list
 
-
 # Función principal para el análisis léxico
-def Analizador_lexico():
-    # Nombre de usuario para el log (puedes modificar esta línea según tu necesidad)
-    username = input("Ingrese su nombre de usuario para el log: ")
-
-    # Nombre y ruta del archivo a analizar (puedes modificar esta línea según tu necesidad)
-    filename = input("Ingrese la direccion del archivo: ")
-
-    # Verificar si el archivo existe
-    if os.path.exists(filename):
-        with open(filename, 'r') as f:
-            data = f.read()
-        lexer = lex.lex()
-        tokens_list = test(data, lexer)
-
-        # Crear carpeta de log si no existe
-        if not os.path.exists('log'):
-            os.makedirs('log')
-
-        # Formatear la fecha y hora actual
-        now = datetime.now()
-        timestamp = now.strftime("%d%m%Y-%Hh%M")
-
-        # Crear nombre de archivo de log
-        log_filename = f'log/lexico-{username}-{timestamp}.txt'
-
-        # Escribir tokens al archivo de log
-        with open(log_filename, 'w') as log_file:
-            for token in tokens_list:
-                log_file.write(str(token) + '\n')
-
-        print(f"Análisis léxico completado. Archivo de tokens generado: {log_filename}")
-
-    else:
-        print("El archivo no existe")
-
-
-# Ejecutar el analizador léxico al correr el script
-if __name__ == '__main__':
-    Analizador_lexico()
-
-
 def analyze_lexical(input_code):
-    # Definir el analizador léxico con ply.lex
-    lexer = lex.lex()
+    global errores_lexicos
+    # Limpiar la lista de errores
+    errores_lexicos = []
     
     # Procesar el código de entrada
     lexer.input(input_code)
@@ -198,25 +155,10 @@ def analyze_lexical(input_code):
         if not tok:
             break
         tokens.append(tok)
-    
     return tokens
 
-# Función para manejar errores léxicos
-def errores_lexicos(data):
-    # Definir el analizador léxico con ply.lex
-    lexer = lex.lex()
-    
-    # Procesar el código de entrada
-    lexer.input(data)
-    
-    # Lista para almacenar los errores léxicos encontrados
-    errores = []
-    
-    # Iterar sobre los errores léxicos encontrados
-    while True:
-        tok = lexer.token()
-        if not tok:
-            break
-        errores.append(tok)
-    
-    return errores
+# Función para obtener los errores léxicos
+def get_lexical_errors():
+    global errores_lexicos
+    return errores_lexicos
+
