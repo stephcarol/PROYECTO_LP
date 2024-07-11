@@ -26,8 +26,10 @@ logging.basicConfig(
 # Tabla de símbolos
 symbol_table = {
     'variables': {},
-    'classes': {}
+    'classes': {},
+    'functions': {}
 }
+
 current_class = None
 
 # Errores sintácticos
@@ -219,20 +221,28 @@ def p_factor(p):
         p[0] = p[2]
         logging.info("Reconocido factor con paréntesis: ({})".format(p[2]))
 
+# Función para analizar el código de entrada
+def analyze_syntax(input_code):
+    parser = yacc.yacc()
+    result = parser.parse(input_code, lexer=lexer)
+    return result
+
+# Lista para almacenar errores sintácticos
+errores_sintacticos = []
+
 # Regla para errores sintácticos
 def p_error(p):
     logging.error("Error sintáctico en la entrada: {}".format(p))
     print("Error sintáctico en la entrada!")
 
-
-# Construir el analizador sintáctico
+# Construir el parser
 parser = yacc.yacc()
-
 
 # Función principal para analizar código de entrada
 def analyze_code(input_code):
     result = parser.parse(input_code)
     return result
+
 
 # Código de prueba
 if __name__ == '__main__':
@@ -249,10 +259,4 @@ if __name__ == '__main__':
     sum(a, 5);
     '''
 
-    result = analyze_code(input_code)
-    if not errores_sintacticos:
-        print("Análisis sintáctico completado sin errores.")
-    else:
-        print("Se encontraron errores sintácticos:")
-        for error in errores_sintacticos:
-            print(error)
+    analyze_code(input_code)

@@ -1,0 +1,1 @@
+2024-07-10 22:51:37,439 - ERROR - Error sint\xe1ctico en la entrada: LexToken(STRING,'int a ',2,5)

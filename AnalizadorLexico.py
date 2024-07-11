@@ -180,3 +180,43 @@ def Analizador_lexico():
 # Ejecutar el analizador léxico al correr el script
 if __name__ == '__main__':
     Analizador_lexico()
+
+
+def analyze_lexical(input_code):
+    # Definir el analizador léxico con ply.lex
+    lexer = lex.lex()
+    
+    # Procesar el código de entrada
+    lexer.input(input_code)
+    
+    # Lista para almacenar los tokens encontrados
+    tokens = []
+    
+    # Iterar sobre los tokens encontrados
+    while True:
+        tok = lexer.token()
+        if not tok:
+            break
+        tokens.append(tok)
+    
+    return tokens
+
+# Función para manejar errores léxicos
+def errores_lexicos(data):
+    # Definir el analizador léxico con ply.lex
+    lexer = lex.lex()
+    
+    # Procesar el código de entrada
+    lexer.input(data)
+    
+    # Lista para almacenar los errores léxicos encontrados
+    errores = []
+    
+    # Iterar sobre los errores léxicos encontrados
+    while True:
+        tok = lexer.token()
+        if not tok:
+            break
+        errores.append(tok)
+    
+    return errores
