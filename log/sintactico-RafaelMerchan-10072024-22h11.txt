@@ -1,0 +1,3 @@
+2024-07-10 22:11:13,284 - ERROR - Error sint\xe1ctico en la entrada: LexToken(STRING,'int a ',2,5)
+2024-07-10 22:11:30,009 - ERROR - Error sint\xe1ctico en la entrada: LexToken(STRING,'int a ',2,5)
+2024-07-10 22:11:56,594 - ERROR - Error sint\xe1ctico en la entrada: LexToken(HASH,'#',1,0)

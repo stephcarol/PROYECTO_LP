@@ -23,14 +23,6 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
-# Reglas de precedencia
-precedence = (
-    ('left', 'PLUS', 'MINUS'),
-    ('left', 'TIMES', 'DIVIDE'),
-    ('left', 'LESS', 'LESSEQUAL', 'GREATER', 'GREATEREQUAL', 'DEQUAL', 'DISTINT'),
-    ('right', 'EQUAL')
-)
-
 # Tabla de símbolos
 symbol_table = {
     'variables': {},
@@ -92,15 +84,61 @@ def p_declaracion_var(p):
     else:
         logging.info("Reconocida declaración de variable con estructura de datos: {} {} = {};".format(p[1], p[2], p[4]))
 
+def p_estructura_dato(p):
+    '''estructura_dato : expresion
+                       | estructura_compuesta'''
+    p[0] = p[1]
+    logging.info("Reconocida estructura de dato: {}".format(p[1]))
+
+def p_estructura_compuesta(p):
+    '''estructura_compuesta : declaracion_lista
+                            | compound_stmt
+                            | tupla'''
+    p[0] = p[1]
+    logging.info("Reconocida estructura compuesta: {}".format(p[1]))
+
+def p_tupla(p):
+    '''tupla : LPAREN elementos RPAREN'''
+    p[0] = {'tipo': 'tupla', 'elementos': p[2]}
+    logging.info("Reconocida tupla: {}".format(p[0]))
+
+def p_elementos(p):
+    '''elementos : elementos COMMA NUMBER
+                 | NUMBER'''
+    if len(p) == 4:
+        p[0] = p[1] + [p[3]]
+    else:
+        p[0] = [p[1]]
+
+def p_igualdad(p):
+    '''igualdad : DEQUAL'''
+    p[0] = p[1]
+    logging.info("Reconocido operador de igualdad: {}".format(p[1]))
+
 
 # Verificar declaración de funciones
 def p_declaracion_funcion(p):
-    '''declaracion_funcion : especificador ID LPAREN parametro RPAREN compound_stmt
-                           | VOID ID LPAREN parametro RPAREN compound_stmt'''
+    '''declaracion_funcion : especificador ID LPAREN parametro RPAREN compound_stmt'''
     if p[1] == 'void':
         logging.info("Reconocida declaración de función void: {}({}) {}".format(p[2], p[4], p[6]))
     else:
         logging.info("Reconocida declaración de función: {} {}({}) {}".format(p[1], p[2], p[4], p[6]))
+
+
+def p_parametro(p):
+    '''parametro : especificador ID
+                 | parametro COMMA especificador ID'''
+    if len(p) == 3:
+        p[0] = [{'type': p[1], 'name': p[2]}]
+        logging.info("Reconocido parámetro: {} {}".format(p[1], p[2]))
+    elif len(p) == 5:
+        p[0] = p[1] + [{'type': p[3], 'name': p[4]}]
+        logging.info("Reconocido parámetro: {}, {} {}".format(p[1], p[3], p[4]))
+
+def p_compound_stmt(p):
+    '''compound_stmt : LBLOCK declaracion_lista RBLOCK'''
+    p[0] = p[2]
+    logging.info("Reconocido bloque de declaración: {{ {} }}".format(p[2]))
 
 
 # Verificar asignaciones y expresiones
@@ -132,14 +170,23 @@ def p_expresion_simple(p):
         logging.info("Reconocida expresión aditiva: {}".format(p[1]))
 
 
+
+
 # Validar tipos en operaciones aditivas
 def p_expresion_aditiva(p):
-    '''expresion_aditiva : expresion_aditiva sumorest termino
+    '''expresion_aditiva : termino sumorest expresion_aditiva
                          | termino'''
-    if len(p) == 4:
-        logging.info("Reconocida expresión aditiva: {} {} {}".format(p[1], p[2], p[3]))
-    else:
-        logging.info("Reconocido término: {}".format(p[1]))
+    if len(p) > 1:
+        if len(p) == 4:
+            if p[1] != p[3]:
+                errores_semantica.append(f"Error: Tipos incompatibles en operación aditiva: '{p[1]}' y '{p[3]}'.")
+            p[0] = p[1]
+            logging.info("Reconocida expresión aditiva: {} {} {}".format(p[1], p[2], p[3]))
+        else:
+            p[0] = p[1]
+            logging.info("Reconocido término: {}".format(p[1]))
+
+
 
 
 # Validar tipos en operadores aditivos
@@ -156,6 +203,21 @@ def p_variable_scope(p):
         errores_sintacticos.append(f"Error: Variable '{p[1]}' utilizada fuera de su alcance.")
     logging.info("Reconocido acceso a variable: {}".format(p[1]))
 
+def p_termino(p):
+    '''termino : factor'''
+    p[0] = p[1]
+    logging.info("Reconocido término: {}".format(p[1]))
+
+def p_factor(p):
+    '''factor : ID
+              | NUMBER
+              | LPAREN expresion RPAREN'''
+    if len(p) == 2:
+        p[0] = p[1]
+        logging.info("Reconocido factor: {}".format(p[1]))
+    elif len(p) == 4:
+        p[0] = p[2]
+        logging.info("Reconocido factor con paréntesis: ({})".format(p[2]))
 
 # Regla para errores sintácticos
 def p_error(p):
@@ -171,7 +233,6 @@ parser = yacc.yacc()
 def analyze_code(input_code):
     result = parser.parse(input_code)
     return result
-
 
 # Código de prueba
 if __name__ == '__main__':
