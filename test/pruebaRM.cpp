@@ -93,11 +93,6 @@ int main() {
 
     // Retorno de valor
     return 0;
-    //Stephany Cabezas
-
-    //Sebasceb
-
-   
    
         int a = 10;
         int b = 15;
