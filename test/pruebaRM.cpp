@@ -13,7 +13,7 @@ float add(float a, float b) {
     }
 
 int main() {
-    //Rafael Merchan
+
     float x = 5.5;
     double y = 10.1;
     char c = 'A';
@@ -69,10 +69,7 @@ int main() {
     std::cout << "PI: " << PI << std::endl;
 
     return 0;
-    //Rafael Merchan 
 
-
-    //Stephany Cabezas
     // Declaración de variables
     int a = 0;
 

@@ -1,0 +1,13 @@
+2024-07-10 22:30:19,636 - ERROR - Error sint\xe1ctico en la entrada: LexToken(HASH,'#',1,0)
+2024-07-10 22:30:24,738 - ERROR - Error sint\xe1ctico en la entrada: LexToken(HASH,'#',32,0)
+2024-07-10 22:30:28,227 - ERROR - Error sint\xe1ctico en la entrada: LexToken(HASH,'#',63,0)
+2024-07-10 22:30:28,436 - ERROR - Error sint\xe1ctico en la entrada: LexToken(HASH,'#',94,0)
+2024-07-10 22:30:28,606 - ERROR - Error sint\xe1ctico en la entrada: LexToken(HASH,'#',125,0)
+2024-07-10 22:30:28,859 - ERROR - Error sint\xe1ctico en la entrada: LexToken(HASH,'#',156,0)
+2024-07-10 22:30:29,095 - ERROR - Error sint\xe1ctico en la entrada: LexToken(HASH,'#',187,0)
+2024-07-10 22:30:33,358 - ERROR - Error sint\xe1ctico en la entrada: LexToken(STRING,'cout ',221,9)
+2024-07-10 22:30:33,760 - ERROR - Error sint\xe1ctico en la entrada: LexToken(STRING,'cout ',229,9)
+2024-07-10 22:30:33,927 - ERROR - Error sint\xe1ctico en la entrada: LexToken(STRING,'cout ',237,9)
+2024-07-10 22:30:37,352 - ERROR - Error sint\xe1ctico en la entrada: None
+2024-07-10 22:30:37,572 - ERROR - Error sint\xe1ctico en la entrada: None
+2024-07-10 22:30:37,710 - ERROR - Error sint\xe1ctico en la entrada: None

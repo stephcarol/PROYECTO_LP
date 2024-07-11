@@ -5,7 +5,7 @@ from AnalizadorSintactico import analyze_code, errores_sintacticos
 class InterfazAnalizador:
     def __init__(self):
         self.root = tk.Tk()
-        self.root.title("Analizador Sintáctico")
+        self.root.title("Analizador")
         self.create_widgets()
 
     def create_widgets(self):
@@ -34,7 +34,7 @@ class InterfazAnalizador:
         analyze_code(input_code)
         self.result_area.delete("1.0", tk.END)
         if not errores_sintacticos:
-            self.result_area.insert(tk.END, "Análisis sintáctico completado sin errores.")
+            self.result_area.insert(tk.END, "Análisis completado sin errores.")
         else:
             errors = "\n".join(errores_sintacticos)
             self.result_area.insert(tk.END, errors)

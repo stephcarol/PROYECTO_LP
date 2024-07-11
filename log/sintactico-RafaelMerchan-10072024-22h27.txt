@@ -1,0 +1,5 @@
+2024-07-10 22:27:07,703 - ERROR - Error sint\xe1ctico en la entrada: LexToken(HASH,'#',1,0)
+2024-07-10 22:28:27,648 - ERROR - Error sint\xe1ctico en la entrada: LexToken(HASH,'#',32,0)
+2024-07-10 22:28:28,468 - ERROR - Error sint\xe1ctico en la entrada: LexToken(HASH,'#',63,0)
+2024-07-10 22:28:28,673 - ERROR - Error sint\xe1ctico en la entrada: LexToken(HASH,'#',94,0)
+2024-07-10 22:28:28,811 - ERROR - Error sint\xe1ctico en la entrada: LexToken(HASH,'#',125,0)

@@ -1,0 +1,1 @@
+2024-07-10 22:22:05,355 - ERROR - Error sint\xe1ctico en la entrada: LexToken(HASH,'#',1,0)
